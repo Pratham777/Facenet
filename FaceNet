@@ -1,0 +1,343 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "FaceNet",
+      "version": "0.3.2",
+      "provenance": [],
+      "collapsed_sections": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "accelerator": "GPU"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "[View in Colaboratory](https://colab.research.google.com/github/Pratham777/Facenet/blob/master/FaceNet)"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "uvlm-sYmzlFp",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 104
+        },
+        "outputId": "0a6ec872-e302-452f-daf0-665946727695"
+      },
+      "cell_type": "code",
+      "source": [
+        "!git clone https://github.com/davidsandberg/facenet.git"
+      ],
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Cloning into 'facenet'...\n",
+            "remote: Counting objects: 3146, done.\u001b[K\n",
+            "remote: Total 3146 (delta 0), reused 0 (delta 0), pack-reused 3146\u001b[K\n",
+            "Receiving objects: 100% (3146/3146), 2.91 MiB | 21.00 MiB/s, done.\n",
+            "Resolving deltas: 100% (2231/2231), done.\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "D58Gaj-vzz8w",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "4a1bbba3-82da-430c-fc17-0754354e2f5d"
+      },
+      "cell_type": "code",
+      "source": [
+        "!ls"
+      ],
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "datalab  facenet  FaceRec  openface\r\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "ypBLwINl0qHt",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "import os\n",
+        "os.chdir(\"facenet/\")"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "JtFrNFcR0yZd",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 52
+        },
+        "outputId": "4be38269-021a-4def-c630-a3e7c307d120"
+      },
+      "cell_type": "code",
+      "source": [
+        "!ls"
+      ],
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "contributed  __init__.py  README.md\t    src   tmp\r\n",
+            "data\t     LICENSE.md   requirements.txt  test  util\r\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "rNLVWfwt0zuP",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "os.mkdir(\"models\")"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "QGDXYSPA1G0Z",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "os.chdir(\"models\")"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "W45VkTrv1Q-r",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 245
+        },
+        "outputId": "dbdd7afd-e31b-4bc7-dd45-fc2b7203d2e9"
+      },
+      "cell_type": "code",
+      "source": [
+        "!wget https://doc-04-7k-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/4cdr01a4i7o55ov3r4rt38kr1pjvuom3/1529056800000/18056234690049221457/*/1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-?e=download"
+      ],
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Warning: wildcards not supported in HTTP.\r\n",
+            "--2018-06-15 13:34:35--  https://doc-04-7k-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/4cdr01a4i7o55ov3r4rt38kr1pjvuom3/1529056800000/18056234690049221457/*/1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-?e=download\r\n",
+            "Resolving doc-04-7k-docs.googleusercontent.com (doc-04-7k-docs.googleusercontent.com)... 74.125.141.132, 2607:f8b0:400c:c06::84\r\n",
+            "Connecting to doc-04-7k-docs.googleusercontent.com (doc-04-7k-docs.googleusercontent.com)|74.125.141.132|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: unspecified [application/zip]\n",
+            "Saving to: ‘1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-?e=download’\n",
+            "\n",
+            "1EXPBSXwTaqrSC0OhUd     [       <=>          ] 183.23M   101MB/s    in 1.8s    \n",
+            "\n",
+            "2018-06-15 13:34:37 (101 MB/s) - ‘1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-?e=download’ saved [192126990]\n",
+            "\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "B10w1XM71aoC",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "!mv 1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-\\?e\\=download model.zip\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "EFzlyTJV1hAC",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 121
+        },
+        "outputId": "4e1067fd-b6f0-40ab-dffc-567c5e7c0300"
+      },
+      "cell_type": "code",
+      "source": [
+        "!unzip model.zip"
+      ],
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Archive:  model.zip\r\n",
+            "   creating: 20180402-114759/\n",
+            "  inflating: 20180402-114759/model-20180402-114759.meta  \n",
+            "  inflating: 20180402-114759/20180402-114759.pb  \n",
+            "  inflating: 20180402-114759/model-20180402-114759.ckpt-275.data-00000-of-00001  \n",
+            "  inflating: 20180402-114759/model-20180402-114759.ckpt-275.index  \n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "E3kZsj201jbX",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "!mv IMG_20180604_111213.jpg amar.jpeg"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "k3N7_md71yM_",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 52
+        },
+        "outputId": "06387756-8f1c-4a98-d3ba-7cf135f759a9"
+      },
+      "cell_type": "code",
+      "source": [
+        "os.chdir(\"..\")\n",
+        "!ls"
+      ],
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "contributed  images\t  LICENSE.md  README.md\t\tsrc   tmp\r\n",
+            "data\t     __init__.py  models      requirements.txt\ttest  util\r\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "1gPc4eU312Iq",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 697
+        },
+        "outputId": "d67fc312-a468-4be9-d188-0f9be531c633"
+      },
+      "cell_type": "code",
+      "source": [
+        "!python ./src/compare.py models/20180402-114759/ images/*"
+      ],
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "/usr/local/lib/python3.6/dist-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.\r\n",
+            "  from ._conv import register_converters as _register_converters\n",
+            "Creating networks and loading parameters\n",
+            "2018-06-15 13:50:21.106629: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:898] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero\n",
+            "2018-06-15 13:50:21.107216: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1356] Found device 0 with properties: \n",
+            "name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235\n",
+            "pciBusID: 0000:00:04.0\n",
+            "totalMemory: 11.17GiB freeMemory: 11.10GiB\n",
+            "2018-06-15 13:50:21.107258: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0\n",
+            "2018-06-15 13:50:21.487391: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:\n",
+            "2018-06-15 13:50:21.487466: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 \n",
+            "2018-06-15 13:50:21.487488: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N \n",
+            "2018-06-15 13:50:21.487900: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11439 MB memory) -> physical GPU (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)\n",
+            "2018-06-15 13:50:21.523071: E tensorflow/stream_executor/cuda/cuda_driver.cc:936] failed to allocate 11.17G (11995578368 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY\n",
+            "/usr/local/lib/python3.6/dist-packages/scipy/misc/pilutil.py:482: FutureWarning: Conversion of the second argument of issubdtype from `int` to `np.signedinteger` is deprecated. In future, it will be treated as `np.int64 == np.dtype(int).type`.\n",
+            "  if issubdtype(ts, int):\n",
+            "/usr/local/lib/python3.6/dist-packages/scipy/misc/pilutil.py:485: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.\n",
+            "  elif issubdtype(type(size), float):\n",
+            "2018-06-15 13:50:24.237288: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0\n",
+            "2018-06-15 13:50:24.237371: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:\n",
+            "2018-06-15 13:50:24.237403: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 \n",
+            "2018-06-15 13:50:24.237429: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N \n",
+            "2018-06-15 13:50:24.237592: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11439 MB memory) -> physical GPU (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)\n",
+            "Model directory: models/20180402-114759/\n",
+            "Metagraph file: model-20180402-114759.meta\n",
+            "Checkpoint file: model-20180402-114759.ckpt-275\n",
+            "Images:\n",
+            "0: images/amar.jpeg\n",
+            "1: images/chris.jpeg\n",
+            "2: images/chris1.jpeg\n",
+            "3: images/chris2.jpeg\n",
+            "\n",
+            "Distance matrix\n",
+            "        0         1         2         3     \n",
+            "0    0.0000    1.3463    1.3683    1.4001  \n",
+            "1    1.3463    0.0000    0.9763    1.1234  \n",
+            "2    1.3683    0.9763    0.0000    1.0522  \n",
+            "3    1.4001    1.1234    1.0522    0.0000  \n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "PwpPBQqp2CwS",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        ""
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
